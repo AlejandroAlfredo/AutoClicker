@@ -16,13 +16,12 @@ public class Autoclicker {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        delay = 250;
+        delay = 200;
     }
 
     public void clickmouse(int button) {
         try {
             robot.mousePress(button);
-            robot.delay(200);
             robot.mouseRelease(button);
             robot.delay(delay);
         } catch (Exception e) {
@@ -38,16 +37,20 @@ public class Autoclicker {
 class ClickerLogic extends Thread {
     private boolean running = false;
     private boolean program_running = true;
-    private int delay = 250;
-    private Autoclicker clicker;
+    private int delay = 200;
+    private Autoclicker clicker = new Autoclicker();
 
     @Override
     public void run() {
-        while (program_running) {
-            while (running) {
-                clicker = new Autoclicker();
-                //clicker.setDelay();//default: 250
+        while (program_running == true) {
+            if (running == true) {
+                clicker.setDelay(delay);
                 clicker.clickmouse(MouseEvent.BUTTON1_MASK);
+            }
+            try {
+                sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -65,6 +68,10 @@ class ClickerLogic extends Thread {
         program_running = false;
     }
 
+    public Boolean isRunning() {
+        return running;
+    }
+
 }
 
 class Form1 extends JFrame {
@@ -74,10 +81,10 @@ class Form1 extends JFrame {
     private ClickerLogic hilo1;
 
     public Form1() {
+        initComponents();
         setLayout(null);
         setTitle("AutoClicker");
         hilo1 = new ClickerLogic();
-        initComponents();
         hilo1.start();
     }
 
@@ -138,7 +145,10 @@ class Form1 extends JFrame {
 
     private void btnStart_click(ActionEvent e) {
         try {
-            hilo1.start_clicking();
+            if (hilo1.isRunning() == false) {
+                System.out.println(">> Start");
+                hilo1.start_clicking();
+            }
         } catch (Exception err) {
             err.printStackTrace();
         } finally {
@@ -149,7 +159,10 @@ class Form1 extends JFrame {
 
     private void btnStop_click(ActionEvent e) {
         try {
-            hilo1.stop_clicking();
+            if (hilo1.isRunning() == true) {
+                System.out.println(">> Stop");
+                hilo1.stop_clicking();
+            }
         } catch (Exception err) {
             err.printStackTrace();
         } finally {
